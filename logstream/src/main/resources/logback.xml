@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<appender name="STDOUT"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern> %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level
+				%logger{36}.%M %L - %msg%n </pattern>
+		</encoder>
+	</appender>
+
+	<property name="APP_LOG" value="logs/application.log" />
+
+	<appender name="FILE-ROLLING"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_LOG}</file>
+
+		<encoder
+			class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern> %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level
+				%logger{36}.%M %L - %msg%n </Pattern>
+		</encoder>
+	</appender>
+
+	<appender name="CYCLIC"
+		class="ch.qos.logback.core.read.CyclicBufferAppender">
+		<MaxSize>512</MaxSize>
+	</appender>
+	<root level="info">
+		<appender-ref ref="CYCLIC" />
+		<appender-ref ref="FILE-ROLLING" />
+		<appender-ref ref="STDOUT" />
+	</root>
+
+</configuration>

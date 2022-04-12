@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -61,30 +62,17 @@ public class FetchLogFileController {
 	 */
 	private ResponseEntity<?> fetchFile(String filePath) {
        
-        byte[] buffer = new byte[8 * 1024];
+		ByteArrayResource resource;
+
         try {
-        	String command =
-        			  "curl -X GET "+filePath;
-        	ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
-        	processBuilder.directory(new File("/var/log/"));
-        	Process process = processBuilder.start();
-        	InputStream inputStream = process.getInputStream();
-			
-        	File targetFile = new File("/logs/"+logFilename);
-        	OutputStream outStream = new FileOutputStream(targetFile);
-        	
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outStream.write(buffer, 0, bytesRead);
-            }
-            IOUtils.closeQuietly(inputStream);
-            IOUtils.closeQuietly(outStream);
+            Path path = Paths.get(filePath);
+            resource = new ByteArrayResource(Files.readAllBytes(path));
         } catch (Exception e) {
             return ResponseEntity.ok().body(e.getMessage());
         }
 
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).body(buffer);
-    }
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+    }    
 
 	/**
 	 * This method is used to read contents from log files folder configured in the property file and 
